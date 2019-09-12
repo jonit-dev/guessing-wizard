@@ -38,14 +38,6 @@ class App extends Component {
     });
   }
 
-  fetchFonts() {
-    return Font.loadAsync({
-      "open-sans": require("./assets/fonts/OpenSans-Regular.ttf"),
-      "open-sans-bold": require("./assets/fonts/OpenSans-Bold.ttf"),
-      "coming-soon-regular": require("./assets/fonts/ComingSoon-Regular.ttf")
-    });
-  }
-
   render() {
     const { appView } = styles;
 
@@ -53,7 +45,7 @@ class App extends Component {
 
     let content = (
       <StartGameScreen
-        onStartGame={selectedNumber => this.startGameHandler(selectedNumber)}
+        onStartGame={selectedNumber => startGameHandler(selectedNumber)}
       />
     ); //default view
 
@@ -61,7 +53,7 @@ class App extends Component {
       content = (
         <GameScreen
           userChoice={this.state.userNumber}
-          onGameOver={numOfRounds => this.gameOverHandler(numOfRounds)}
+          onGameOver={numOfRounds => gameOverHandler(numOfRounds)}
         />
       );
     } else if (this.state.guessRounds > 0) {
@@ -69,7 +61,7 @@ class App extends Component {
         <GameOverScreen
           userNumber={this.state.userNumber}
           roundsNumber={this.state.guessRounds}
-          onStartNewGame={() => this.configureNewGameHandler()}
+          onStartNewGame={() => configureNewGameHandler()}
         />
       );
     }
@@ -77,7 +69,7 @@ class App extends Component {
     if (!this.state.dataLoaded) {
       return (
         <AppLoading
-          startAsync={() => this.fetchFonts()}
+          startAsync={() => fetchFonts()}
           onFinish={() => this.setState({ dataLoaded: true })}
           onError={err => console.log(err)}
         />
@@ -98,3 +90,10 @@ const styles = StyleSheet.create({
   }
 });
 export default App;
+const fetchFonts = () => {
+  return Font.loadAsync({
+    "open-sans": require("./assets/fonts/OpenSans-Regular.ttf"),
+    "open-sans-bold": require("./assets/fonts/OpenSans-Bold.ttf"),
+    "coming-soon-regular": require("./assets/fonts/ComingSoon-Regular.ttf")
+  });
+};

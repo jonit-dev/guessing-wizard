@@ -91,7 +91,7 @@ const StartGameScreen = props => {
       }}
     >
       <View style={screenContainer}>
-        <Text style={Typography.h1}>Start A New Game</Text>
+        <Text style={Typography.h1}>Start a New Game</Text>
 
         <Card>
           <Text style={Typography.p}>Select a number between 0 and 99:</Text>

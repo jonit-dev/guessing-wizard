@@ -26,8 +26,9 @@ const GameOverScreen = props => {
 
       <View style={gameStatsContainer}>
         <Text style={{ ...Typography.p, ...resultText }}>
-          The wizard needed <Text style={Typography.featuredText}>XXX</Text>{" "}
-          rounds to guess the secret number!
+          The wizard needed{" "}
+          <Text style={Typography.featuredText}>{roundsNumber}</Text> rounds to
+          guess the secret number!
         </Text>
 
         <Text style={{ ...Typography.p, ...resultText }}>

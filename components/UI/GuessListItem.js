@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Dimensions } from "react-native";
 
 import { EvilIcons } from "@expo/vector-icons";
 
@@ -25,8 +25,8 @@ const GuessListItem = props => {
 
 const styles = StyleSheet.create({
   guessListItemContainer: {
-    flex: 1,
-    width: "100%",
+    // width: "100%",
+    width: Dimensions.get("window").width > 500 ? "60%" : "80%",
     marginVertical: 10,
     padding: 10,
     borderColor: "#ccc",
@@ -36,7 +36,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     position: "relative",
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    height: 50
   },
   guessListItemText: {
     textAlign: "center",

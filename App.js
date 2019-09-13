@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView } from "react-native";
 import Header from "./components/UI/Header";
 import StartGameScreen from "./components/views/StartGameScreen";
 import GameScreen from "./components/views/GameScreen.js";
@@ -85,10 +85,10 @@ class App extends Component {
     }
 
     return (
-      <View style={appView}>
+      <SafeAreaView style={appView}>
         <Header title="Guess a Number!" />
         {content}
-      </View>
+      </SafeAreaView>
     );
   }
 }

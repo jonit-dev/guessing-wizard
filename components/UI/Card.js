@@ -11,8 +11,9 @@ const Card = props => {
 const styles = StyleSheet.create({
   cardContainer: {
     borderRadius: 5,
-    width: 300,
-    maxWidth: "80%",
+    width: "90%",
+    maxWidth: "95%",
+    minWidth: 300,
     alignItems: "center",
 
     backgroundColor: "white",

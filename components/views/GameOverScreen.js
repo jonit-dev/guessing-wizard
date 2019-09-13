@@ -1,7 +1,16 @@
-import React from "react";
-import { Text, View, StyleSheet, Image, Button } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Button,
+  Dimensions,
+  ScrollView
+} from "react-native";
 import { Colors, Typography } from "../../constants";
 import MainButton from "../UI/MainButton";
+import Helper from "../../utils/Helper.js";
 
 const GameOverScreen = props => {
   const {
@@ -13,35 +22,69 @@ const GameOverScreen = props => {
   } = styles;
   const { roundsNumber, userNumber } = props;
 
+  const [deviceWidth, setDeviceWidth] = useState(
+    Dimensions.get("window").width
+  );
+
+  const [deviceHeight, setDeviceHeight] = useState(
+    Dimensions.get("window").height
+  );
+
+  //Helper function to update device width and height on device changes
+  Helper.updateOnOrientationChanges(
+    Dimensions,
+    setDeviceWidth,
+    setDeviceHeight,
+    useEffect
+  );
+
   return (
-    <View style={gameOverScreenContainer}>
-      <Text style={Typography.h1}>The game is over!</Text>
+    <ScrollView>
+      <View style={gameOverScreenContainer}>
+        <Text style={Typography.h1}>The game is over!</Text>
 
-      <View style={imageContainer}>
-        <Image
-          style={wizardStyle}
-          source={require("../../assets/images/wizard.png")}
-        />
+        <View
+          style={{
+            ...imageContainer,
+            ...{
+              width: deviceWidth * 0.7,
+              height: deviceWidth * 0.7,
+              borderRadius: (deviceWidth * 0.7) / 2,
+              marginVertical: deviceHeight / 30
+            }
+          }}
+        >
+          <Image
+            style={wizardStyle}
+            source={require("../../assets/images/wizard.png")}
+          />
+        </View>
+
+        <View
+          style={{
+            ...gameStatsContainer,
+            ...{ marginVertical: deviceHeight / 60 }
+          }}
+        >
+          <Text style={{ ...Typography.p, ...resultText }}>
+            The wizard needed{" "}
+            <Text style={Typography.featuredText}>{roundsNumber}</Text> rounds
+            to guess the secret number!
+          </Text>
+
+          <Text style={{ ...Typography.p, ...resultText }}>
+            Number of Rounds{" "}
+            <Text style={Typography.featuredText}>{roundsNumber}</Text>
+          </Text>
+          <Text style={{ ...Typography.p, ...resultText }}>
+            Number was:{" "}
+            <Text style={Typography.featuredText}>{userNumber}</Text>
+          </Text>
+        </View>
+
+        <MainButton onPress={() => props.onStartNewGame()}>New Game</MainButton>
       </View>
-
-      <View style={gameStatsContainer}>
-        <Text style={{ ...Typography.p, ...resultText }}>
-          The wizard needed{" "}
-          <Text style={Typography.featuredText}>{roundsNumber}</Text> rounds to
-          guess the secret number!
-        </Text>
-
-        <Text style={{ ...Typography.p, ...resultText }}>
-          Number of Rounds{" "}
-          <Text style={Typography.featuredText}>{roundsNumber}</Text>
-        </Text>
-        <Text style={{ ...Typography.p, ...resultText }}>
-          Number was: <Text style={Typography.featuredText}>{userNumber}</Text>
-        </Text>
-      </View>
-
-      <MainButton onPress={() => props.onStartNewGame()}>New Game</MainButton>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -60,6 +103,7 @@ const styles = StyleSheet.create({
   gameStatsContainer: {
     marginBottom: 20,
     marginHorizontal: 30,
+
     textAlign: "center"
   },
 
@@ -75,15 +119,12 @@ const styles = StyleSheet.create({
     flex: 1
   },
   imageContainer: {
-    width: "80%",
-    borderRadius: 150,
     borderWidth: 3,
     borderColor: "black",
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
-    marginVertical: 30,
-    maxHeight: "50%",
+
     backgroundColor: "purple"
   },
   wizardStyle: {

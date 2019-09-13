@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -6,7 +6,10 @@ import {
   Button,
   TouchableWithoutFeedback,
   Keyboard,
-  Alert
+  Alert,
+  Dimensions,
+  ScrollView,
+  KeyboardAvoidingView
 } from "react-native";
 import Card from "../UI/Card.js";
 import Input from "../UI/Input.js";
@@ -31,6 +34,27 @@ const StartGameScreen = props => {
   const [enteredValue, setEnteredValue] = useState("");
   const [confirmed, setConfirmed] = useState(false);
   const [selectedNumber, setSelectedNumber] = useState("");
+  const [buttonWidth, setButtonWidth] = useState(
+    Dimensions.get("window").width / 4
+  );
+
+  //you have to add these orientation listeners into useEffect to prevent stacking of Dimensions.addEventListener
+  useEffect(() => {
+    const updateLayout = () => {
+      setButtonWidth(Dimensions.get("window").width / 4);
+      console.log("rotating device... => updating layout!");
+    };
+
+    //Listening to device orientation changes!
+    Dimensions.addEventListener("change", updateLayout);
+
+    //this is the use effect "clean up" function. It prevents addEventlistener from stacking
+
+    return () => {
+      console.log("cleaning rotate event listeners...");
+      Dimensions.removeEventListener("change", updateLayout);
+    };
+  });
 
   const numberInputHandler = inputText => {
     setEnteredValue(inputText.replace(/[^0-9]/g, ""));
@@ -85,46 +109,52 @@ const StartGameScreen = props => {
   }
 
   return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        Keyboard.dismiss();
-      }}
-    >
-      <View style={screenContainer}>
-        <Text style={Typography.h1}>Start a New Game</Text>
+    <ScrollView>
+      <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={30}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            Keyboard.dismiss();
+          }}
+        >
+          <View style={screenContainer}>
+            <Text style={Typography.h1}>Start a New Game</Text>
 
-        <Card>
-          <Text style={Typography.p}>Select a number between 0 and 99:</Text>
-          <Input
-            autoCorrect={false}
-            keyboardType="numeric"
-            blurOnSubmit
-            autoCapitalize="none"
-            maxLength={2}
-            onChangeText={numberInputHandler}
-            value={enteredValue}
-          />
-          <View style={screenBtnWrapper}>
-            <View style={btnWrapper}>
-              <Button
-                title="Reset"
-                onPress={() => resetInputHandler()}
-                color={Colors.primary}
+            <Card>
+              <Text style={Typography.p}>
+                Select a number between 0 and 99:
+              </Text>
+              <Input
+                autoCorrect={false}
+                keyboardType="numeric"
+                blurOnSubmit
+                autoCapitalize="none"
+                maxLength={2}
+                onChangeText={numberInputHandler}
+                value={enteredValue}
               />
-            </View>
-            <View style={btnWrapper}>
-              <Button
-                title="Confirm"
-                onPress={() => confirmInputHandler()}
-                color={Colors.accent}
-              />
-            </View>
+              <View style={screenBtnWrapper}>
+                <View style={{ width: buttonWidth }}>
+                  <Button
+                    title="Reset"
+                    onPress={() => resetInputHandler()}
+                    color={Colors.primary}
+                  />
+                </View>
+                <View style={{ width: buttonWidth }}>
+                  <Button
+                    title="Confirm"
+                    onPress={() => confirmInputHandler()}
+                    color={Colors.accent}
+                  />
+                </View>
+              </View>
+            </Card>
+
+            {confirmedOutput}
           </View>
-        </Card>
-
-        {confirmedOutput}
-      </View>
-    </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </ScrollView>
   );
 };
 
@@ -147,10 +177,6 @@ const styles = StyleSheet.create({
   btnStartGame: {
     width: "100%",
     marginTop: 20
-  },
-
-  btnWrapper: {
-    width: 100
   },
 
   screenBtnWrapper: {

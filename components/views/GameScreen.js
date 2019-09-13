@@ -5,7 +5,8 @@ import {
   StyleSheet,
   Button,
   Alert,
-  ScrollView
+  ScrollView,
+  Dimensions
 } from "react-native";
 import NumberContainer from "../UI/NumberContainer";
 import Card from "../UI/Card.js";
@@ -13,12 +14,13 @@ import MainButton from "../UI/MainButton";
 
 import { Ionicons } from "@expo/vector-icons";
 import GuessListItem from "../UI/GuessListItem";
+import Helper from "../../utils/Helper";
 
 // Component ========================================
 
 const GameScreen = props => {
   const initialGuess = generateRandomBetween(1, 100, props.userChoice);
-  const { gameScreenContainer, hintBtnWrapper } = styles;
+  const { gameScreenContainer, hintBtnWrapper, listStyle, controls } = styles;
   const { userChoice, onGameOver } = props;
 
   // Hooks ========================================
@@ -26,26 +28,20 @@ const GameScreen = props => {
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
   const [rounds, setRounds] = useState(0);
   const [pastGuesses, setPastGuesses] = useState([initialGuess]);
+  const [deviceWidth, setDeviceWidth] = useState(
+    Dimensions.get("window").width
+  );
+  const [deviceHeight, setDeviceHeight] = useState(
+    Dimensions.get("window").height
+  );
 
-  const guidGenerator = () => {
-    var S4 = function() {
-      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-    };
-    return (
-      S4() +
-      S4() +
-      "-" +
-      S4() +
-      "-" +
-      S4() +
-      "-" +
-      S4() +
-      "-" +
-      S4() +
-      S4() +
-      S4()
-    );
-  };
+  //Helper function to update device width and height on device changes
+  Helper.updateOnOrientationChanges(
+    Dimensions,
+    setDeviceWidth,
+    setDeviceHeight,
+    useEffect
+  );
 
   //use effect runs AFTER every render cycle
   useEffect(() => {
@@ -93,40 +89,78 @@ const GameScreen = props => {
     console.log(`Next number is ${nextNumber}`);
   };
 
-  return (
-    <View style={gameScreenContainer}>
-      <Text>Opponent's Guess</Text>
-      <NumberContainer>{currentGuess}</NumberContainer>
-      <Card style={hintBtnWrapper}>
-        <MainButton onPress={() => nextGuessHandler("lower")}>
-          <Ionicons name="md-remove" size={24} color="white" />
-        </MainButton>
-        <MainButton onPress={() => nextGuessHandler("higher")}>
-          <Ionicons name="md-add" size={24} color="white" />
-        </MainButton>
-      </Card>
+  if (Dimensions.get("window").height < 500) {
+    return (
+      <View style={gameScreenContainer}>
+        <Text>Opponent's Guess</Text>
 
-      <View style={{ width: "80%", flex: 1 }}>
-        <ScrollView>
-          {pastGuesses.map((guess, i) => {
-            const listItemInfo = {
-              text: guess,
-              round: rounds
-            };
+        <View style={controls}>
+          <MainButton onPress={() => nextGuessHandler("lower")}>
+            <Ionicons name="md-remove" size={24} color="white" />
+          </MainButton>
+          <NumberContainer>{currentGuess}</NumberContainer>
+          <MainButton onPress={() => nextGuessHandler("higher")}>
+            <Ionicons name="md-add" size={24} color="white" />
+          </MainButton>
+        </View>
 
-            return (
-              <GuessListItem
-                key={guidGenerator()}
-                numRound={listItemInfo.round - i}
-              >
-                {listItemInfo.text}
-              </GuessListItem>
-            );
-          })}
-        </ScrollView>
+        <View style={{ width: "80%", flex: 1 }}>
+          <ScrollView contentContainerStyle={listStyle}>
+            {pastGuesses.map((guess, i) => {
+              const listItemInfo = {
+                text: guess,
+                round: rounds
+              };
+
+              return (
+                <GuessListItem
+                  key={Helper.guidGenerator()}
+                  numRound={listItemInfo.round - i}
+                >
+                  {listItemInfo.text}
+                </GuessListItem>
+              );
+            })}
+          </ScrollView>
+        </View>
       </View>
-    </View>
-  );
+    );
+  } else {
+    return (
+      <View style={gameScreenContainer}>
+        <Text>Opponent's Guess</Text>
+        <NumberContainer>{currentGuess}</NumberContainer>
+        <Card style={hintBtnWrapper}>
+          <MainButton onPress={() => nextGuessHandler("lower")}>
+            <Ionicons name="md-remove" size={24} color="white" />
+          </MainButton>
+          <MainButton onPress={() => nextGuessHandler("higher")}>
+            <Ionicons name="md-add" size={24} color="white" />
+          </MainButton>
+        </Card>
+
+        <View style={{ width: "80%", flex: 1 }}>
+          <ScrollView contentContainerStyle={listStyle}>
+            {pastGuesses.map((guess, i) => {
+              const listItemInfo = {
+                text: guess,
+                round: rounds
+              };
+
+              return (
+                <GuessListItem
+                  key={Helper.guidGenerator()}
+                  numRound={listItemInfo.round - i}
+                >
+                  {listItemInfo.text}
+                </GuessListItem>
+              );
+            })}
+          </ScrollView>
+        </View>
+      </View>
+    );
+  }
 };
 
 // Functions
@@ -154,9 +188,22 @@ const styles = StyleSheet.create({
   hintBtnWrapper: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: 20,
     width: 300,
     maxWidth: "80%"
+  },
+  listStyle: {
+    marginTop: 20,
+    paddingBottom: 20,
+    width: "100%",
+    flexGrow: 1, //fix unscrollable list on android
+    alignItems: "center",
+    justifyContent: "flex-end"
+  },
+  controls: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "80%",
+    alignItems: "center"
   }
 });
 
